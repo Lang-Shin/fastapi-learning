@@ -1,10 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
+from fastapi.templating import Jinja2Templates
 
 
 app = FastAPI()
 
-post: list[dict] = [
-     {
+templates = Jinja2Templates(directory="templates")
+
+# Init data
+recipes: list[dict] = [
+    {
         "id": 1,
         "title": "Chicken Adobo",
         "ingredients": [
@@ -56,3 +60,16 @@ post: list[dict] = [
         "cook_time_minutes": 20
     }
 ]
+
+@app.get("/", include_in_schema=False)
+@app.get("/home", include_in_schema=False)
+def home(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "page.html",
+        {"recipes" : recipes, "title" : "Title"}
+    )
+
+@app.get("/api/posts")
+def get_posts():
+    return recipes

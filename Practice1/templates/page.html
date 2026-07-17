@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% if title%}
+    <title> Recipe Box - {{ title }}</title>
+  {% else %}
+    <title> Recipe Box</title>
+  {% endif %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <div class="layout">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar">
+      <div class="sidebar__header">
+        <h1 class="sidebar__title">The Recipe Box</h1>
+        <p class="sidebar__count">{{ recipes|length }} recipe{{ recipes|length != 1 and "s" or "" }} on the shelf</p>
+      </div>
+
+      <div class="sidebar__search">
+        <input
+          type="text"
+          id="recipe-search"
+          class="sidebar__search-input"
+          placeholder="Search recipes..."
+          autocomplete="off"
+        >
+      </div>
+
+      <nav class="recipe-list" id="recipe-list">
+        {% for recipe in recipes %}
+        <a
+          href="/recipes/{{ recipe.id }}"
+          class="recipe-list__item {% if active_recipe and recipe.id == active_recipe.id %}active{% endif %}"
+          data-title="{{ recipe.title|lower }}"
+        >
+          <span class="recipe-list__marker"></span>
+          <span class="recipe-list__title">{{ recipe.title }}</span>
+          <span class="recipe-list__time">{{ recipe.cooking_time }} min</span>
+        </a>
+        {% else %}
+        <p class="recipe-list__empty">No recipes filed yet.</p>
+        {% endfor %}
+      </nav>
+    </aside>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="content">
+      {% if active_recipe %}
+      <article class="recipe-detail">
+
+        <header class="recipe-detail__header">
+          <span class="recipe-detail__eyebrow">No. {{ "%03d"|format(active_recipe.id) }}</span>
+          <h2 class="recipe-detail__title">{{ active_recipe.title }}</h2>
+          <span class="recipe-detail__time">&#9201; {{ active_recipe.cooking_time }} minutes</span>
+        </header>
+
+        <section class="recipe-detail__section">
+          <h3 class="recipe-detail__label">Ingredients</h3>
+          <ul class="checklist" id="ingredients-list">
+            {% for ingredient in active_recipe.ingredients %}
+            <li class="checklist__item">
+              <span class="checklist__box"></span>
+              <span class="checklist__text">{{ ingredient }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </section>
+
+        <section class="recipe-detail__section">
+          <h3 class="recipe-detail__label">Steps</h3>
+          <ol class="steps" id="steps-list">
+            {% for step in active_recipe.steps %}
+            <li class="steps__item">
+              <span class="steps__number">{{ loop.index }}</span>
+              <span class="steps__text">{{ step }}</span>
+            </li>
+            {% endfor %}
+          </ol>
+        </section>
+
+      </article>
+      {% else %}
+      <div class="no-selection">
+        <span class="no-selection__mark">&#127860;</span>
+        <h2 class="no-selection__title">Nothing on the counter yet</h2>
+        <p class="no-selection__text">Pick a recipe from the shelf on the left to see it here.</p>
+      </div>
+      {% endif %}
+    </main>
+
+  </div>
+
+  <script src="/static/js/script.js"></script>
+</body>
+</html>
