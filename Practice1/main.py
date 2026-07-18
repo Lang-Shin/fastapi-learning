@@ -1,7 +1,9 @@
 from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as starletteHTTPException
 
 app = FastAPI()
 
@@ -103,3 +105,7 @@ def get_recipe(recipe_id: int):
         
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe Not Found.")
 
+
+@app.exception_handler(starletteHTTPException)
+def general_http_exception_handler(request: Request, exception: starletteHTTPException):
+    pass
