@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% if title%}
+    <title> Recipe Box - {{ title }}</title>
+  {% else %}
+    <title> Recipe Box</title>
+  {% endif %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for("static", path="css/style.css") }}">
+</head>
+<body>
+
+  <div class="layout">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar">
+      <div class="sidebar__header">
+        <h1 class="sidebar__title">The Recipe Box</h1>
+        <p class="sidebar__count">{{ recipes|length }} recipe{{ recipes|length != 1 and "s" or "" }} on the shelf</p>
+      </div>
+
+      <div class="sidebar__search">
+        <input
+          type="text"
+          id="recipe-search"
+          class="sidebar__search-input"
+          placeholder="Search recipes..."
+          autocomplete="off"
+        >
+      </div>
+
+      <nav class="recipe-list" id="recipe-list">
+        {% for recipe in recipes %}
+        <a
+          href="/recipes/{{ recipe.id }}"
+          class="recipe-list__item {% if active_recipe and recipe.id == active_recipe.id %}active{% endif %}"
+          data-title="{{ recipe.title|lower }}"
+        >
+          <span class="recipe-list__marker"></span>
+          <span class="recipe-list__title">{{ recipe.title }}</span>
+          <span class="recipe-list__time">{{ recipe.cooking_time }} min</span>
+        </a>
+        {% else %}
+        <p class="recipe-list__empty">No recipes filed yet.</p>
+        {% endfor %}
+      </nav>
+    </aside>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="content">
+      {% block content %}
+      {% endblock content %}
+    </main>
+
+  </div>
+
+  <script src="{{ url_for("static", path="js/script.js") }}"></script>
+</body>
+</html>

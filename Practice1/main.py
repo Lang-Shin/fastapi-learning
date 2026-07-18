@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as starletteHTTPException
+from schema import RecipeResponse
 
 app = FastAPI()
 
@@ -90,14 +91,16 @@ def get_recipe(request: Request, recipe_id: int):
                     "title" : recipe.get("title")
                 }
             )
+    
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post Not Found")
 
 
-@app.get("/api/recipes")
+@app.get("/api/recipes", response_model=list[RecipeResponse])
 def get_recipes():
     return recipes
 
 
-@app.get("/api/recipes/{recipe_id}")
+@app.get("/api/recipes/{recipe_id}", response_model=RecipeResponse)
 def get_recipe(recipe_id: int):
     for recipe in recipes:
         if recipe.get("id") == recipe_id:
@@ -108,4 +111,22 @@ def get_recipe(recipe_id: int):
 
 @app.exception_handler(starletteHTTPException)
 def general_http_exception_handler(request: Request, exception: starletteHTTPException):
-    pass
+    message = (
+        exception.detail
+        if exception.detail
+        else "An error occured. Please check your request and try again."
+    )
+    
+    if request.url.path.startswith("/api"):
+        return JSONResponse(status_code=exception.status_code, content={"detail" : message})
+    
+    return templates.TemplateResponse(
+        request,
+        "error.html",
+        {
+            "status_code" : exception.status_code,
+            "title" : exception.status_code,
+            "detail" : message
+        },
+        status_code=exception.status_code
+    )
