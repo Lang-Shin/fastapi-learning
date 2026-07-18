@@ -19,7 +19,7 @@
     <!-- ============ SIDEBAR ============ -->
     <aside class="sidebar">
       <div class="sidebar__header">
-        <h1 class="sidebar__title">The Recipe Box</h1>
+        <a class="sidebar__title" href="{{ url_for("home") }}">The Recipe Box</a>
         <p class="sidebar__count">{{ recipes|length }} recipe{{ recipes|length != 1 and "s" or "" }} on the shelf</p>
       </div>
 
