@@ -1,10 +1,13 @@
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
+
+app.mount("/static", StaticFiles(directory="static"), name="static")    # for CSS / JS
 
 # Init data
 recipes: list[dict] = [
@@ -63,6 +66,7 @@ recipes: list[dict] = [
 
 @app.get("/", include_in_schema=False)
 @app.get("/home", include_in_schema=False)
+@app.get("/recipes", include_in_schema=False)
 def home(request: Request):
     return templates.TemplateResponse(
         request,
@@ -70,6 +74,32 @@ def home(request: Request):
         {"recipes" : recipes, "title" : "Title"}
     )
 
-@app.get("/api/posts")
-def get_posts():
+@app.get("/recipes/{recipe_id}", include_in_schema=False)
+def get_recipe(request: Request, recipe_id: int):
+    for recipe in recipes:
+        if recipe.get("id") == recipe_id:
+            
+            return templates.TemplateResponse(
+                request,
+                "page.html",
+                {
+                    "recipes" : recipes, 
+                    "active_recipe" : recipe,
+                    "title" : recipe.get("title")
+                }
+            )
+
+
+@app.get("/api/recipes")
+def get_recipes():
     return recipes
+
+
+@app.get("/api/recipes/{recipe_id}")
+def get_recipe(recipe_id: int):
+    for recipe in recipes:
+        if recipe.get("id") == recipe_id:
+            return recipe
+        
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe Not Found.")
+

@@ -10,7 +10,7 @@
   {% endif %}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="{{ url_for("static", path="css/style.css") }}">
 </head>
 <body>
 
@@ -97,6 +97,6 @@
 
   </div>
 
-  <script src="/static/js/script.js"></script>
+  <script src="{{ url_for("static", path="js/script.js") }}"></script>
 </body>
 </html>
