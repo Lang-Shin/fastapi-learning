@@ -8,6 +8,10 @@ class RecipeBase(BaseModel):
     cook_time_minutes : int 
     
 
+class RecipeCreate(RecipeBase):
+    pass
+
+
 class RecipeResponse(RecipeBase):
     model_config = ConfigDict(from_attributes=True)
     

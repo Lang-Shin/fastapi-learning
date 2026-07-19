@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as starletteHTTPException
-from schema import RecipeResponse
+from schema import RecipeResponse, RecipeCreate
 
 app = FastAPI()
 
@@ -107,6 +107,23 @@ def get_recipe(recipe_id: int):
             return recipe
         
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe Not Found.")
+
+
+@app.post("/api/recipes", response_model=RecipeResponse, status_code=status.HTTP_201_CREATED)
+def add_recipe(recipe: RecipeCreate):
+    new_id = max(r['id'] for r in recipes) + 1 if recipe else 1
+    
+    new_recipe = {
+        "id" : new_id,
+        "title" : recipe.title,
+        "ingredients" : recipe.ingredients,
+        "steps" : recipe.steps,
+        "cook_time_minutes" : recipe.cook_time_minutes
+    }
+    
+    recipes.append(new_recipe)
+    
+    return new_recipe
 
 
 @app.exception_handler(starletteHTTPException)
