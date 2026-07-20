@@ -23,8 +23,8 @@ templates = Jinja2Templates(directory="templates")
 
 
 
-app.get("/", include_in_schema=False, name="home")
-app.get("/posts", include_in_schema=False, name="posts")
+@app.get("/", include_in_schema=False, name="home")
+@app.get("/posts", include_in_schema=False, name="posts")
 def home(request: Request, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(select(models.Post))
     posts = result.scalars().all()
