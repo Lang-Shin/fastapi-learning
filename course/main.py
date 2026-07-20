@@ -64,7 +64,7 @@ def create_user(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(
         select(models.User).where(models.User.email == user.email)
     )
-    existing_email = result.scalar().first()
+    existing_email = result.scalars().first()
     
     if existing_email:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists")
@@ -86,12 +86,29 @@ def get_user(user_id: int, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(
         select(models.User).where(models.User.id == user_id)
     )
-    user = result.scalar().first()
+    user = result.scalars().first()
 
     if user:
         return user
     
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+
+
+@app.get("api/users/{user_id}/posts", response_model=list[PostResponse])
+def get_user_posts(user_id: int, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(
+        select(models.User).where(models.User.id == user_id)
+    )
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+    
+    result = db.execute(
+        select(models.Post).where(models.Post.user_id == user_id)
+    )
+    posts = result.scalars().all()
+    
+    return posts
 
 
 @app.get("/api/posts", response_model=list[PostResponse])
