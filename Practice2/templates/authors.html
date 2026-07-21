@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Authors · Bookmark</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <div class="wordmark">Bookmark<span class="dot">.</span></div>
+    <nav class="primary">
+      <a href="index.html">Books</a>
+      <a href="authors.html" aria-current="page">Authors</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <section class="hero" style="margin-bottom: 40px;">
+      <div class="eyebrow">Authors</div>
+      <h1>Who wrote what's on the shelf.</h1>
+      <p class="sub">Every author with at least one book tracked in the library.</p>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>All authors</h2>
+        <span class="count-tag"><span id="author-count">0</span> authors</span>
+      </div>
+      <div class="grid" id="author-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">Bookmark — a personal reading log. Data shown here is static; built for a FastAPI backend.</div>
+</footer>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+<script>renderAuthors();</script>
+</body>
+</html>

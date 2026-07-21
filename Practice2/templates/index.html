@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bookmark · A Personal Library</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <div class="wordmark">Bookmark<span class="dot">.</span></div>
+    <nav class="primary">
+      <a href="index.html" aria-current="page">Books</a>
+      <a href="authors.html">Authors</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <section class="hero">
+      <div class="eyebrow">A personal library</div>
+      <h1>Every book you've read,<br>kept quietly in order.</h1>
+      <p class="sub">A running shelf of what's been read, who wrote it, and what was thought of it. No noise, no algorithm — just the record.</p>
+
+      <div class="shelf" id="shelf-row" aria-label="Browse by spine"></div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>All books</h2>
+        <span class="count-tag"><span id="book-count">0</span> titles tracked</span>
+      </div>
+      <div class="grid" id="book-grid"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">Bookmark — a personal reading log. Data shown here is static; built for a FastAPI backend.</div>
+</footer>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+<script>renderHome();</script>
+</body>
+</html>
