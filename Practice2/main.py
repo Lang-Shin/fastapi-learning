@@ -68,7 +68,7 @@ GENRE_COLOR = {
 }
 
 
-# Home Route
+# Home Page Route
 @app.get("/", include_in_schema=False)
 @app.get("/home", include_in_schema=False)
 def home(request: Request):
@@ -78,7 +78,7 @@ def home(request: Request):
         {"authors" : authors, "books" : books}
     )
 
-
+# Authors Page Route
 @app.get("/authors", include_in_schema=False)
 def authors_page(request: Request):
     return templates.TemplateResponse(
@@ -86,6 +86,23 @@ def authors_page(request: Request):
         "authors.html",
         {"authors" : authors, "books" : books}
     )
+    
+
+@app.get("/books/{book_id}", include_in_schema=False)
+def book_shelf(request: Request, book_id: int):
+    for book in books:
+        if book.get("id") == book_id:
+            author = next((a for a in authors if a['id'] == book.get("authorId")))
+            
+            return templates.TemplateResponse(
+                request,
+                "book.html",
+                {"book" : book, "author" : author},
+                status_code=status.HTTP_200_OK
+            )
+            
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found.")
+
 
 @app.get("/api/authors")
 def get_authors():
