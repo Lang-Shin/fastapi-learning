@@ -1,33 +1,81 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Book · Bookmark</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}{{ book.title }} · Bookmark{% endblock %}
+{% block content %}
 
-<header class="site">
-  <div class="wrap">
-    <div class="wordmark">Bookmark<span class="dot">.</span></div>
-    <nav class="primary">
-      <a href="index.html" aria-current="page">Books</a>
-      <a href="authors.html">Authors</a>
-    </nav>
+{% set genre_tone = {
+  'Fiction': 'sage',
+  'Historical Fiction': 'ochre',
+  'Poetry': 'rose',
+  'Essays': 'rose',
+  'Nonfiction': 'slate',
+  'Fantasy': 'plum'
+} %}
+
+{% set review_count = book.reviews|length %}
+{% set avg = (book.reviews | sum(attribute='rating') / review_count) if review_count > 0 else None %}
+{% set rounded = avg|round(0, 'common')|int if avg else 0 %}
+
+<div class="wrap">
+  <div class="breadcrumb"><a href="{{ url_for('home') }}">Books</a> / {{ book.title }}</div>
+
+  <div class="detail-head">
+    <div class="cover-block tone-{{ genre_tone.get(book.genre, 'sage') }}">
+      <span class="cover-title">{{ book.title }}</span>
+    </div>
+
+    <div>
+      <h1>{{ book.title }}</h1>
+      <div class="by-line">
+        by
+        {% if author %}
+          <a href="/authors/{{ author.id }}">{{ author.name }}</a>
+        {% else %}
+          Unknown
+        {% endif %}
+        · {{ book.year }}
+      </div>
+
+      <div class="tags-row">
+        <span class="pill">{{ book.genre }}</span>
+        <span class="pill">{{ book.pages }} pages</span>
+      </div>
+
+      <p class="desc">{{ book.description }}</p>
+
+      <div class="rating-summary">
+        <span class="dots">
+          {% for i in range(1, 6) %}
+            <span class="dot {{ 'filled' if i <= rounded else '' }}"></span>
+          {% endfor %}
+        </span>
+        <span class="big-num">{{ "%.1f"|format(avg) if avg else "—" }}</span>
+        <span style="color:var(--taupe); font-size:13px;">
+          {{ review_count }} review{{ "" if review_count == 1 else "s" }}
+        </span>
+      </div>
+    </div>
   </div>
-</header>
 
-<main>
-  <div class="wrap" id="book-root"></div>
-</main>
+  <div class="reviews">
+    <h2>Reviews</h2>
+    {% if book.reviews %}
+      {% for r in book.reviews %}
+        <div class="review">
+          <div class="review-top">
+            <span class="reviewer">{{ r.reviewer }}</span>
+            <span class="dots">
+              {% for i in range(1, 6) %}
+                <span class="dot {{ 'filled' if i <= r.rating else '' }}"></span>
+              {% endfor %}
+            </span>
+          </div>
+          <p class="comment">{{ r.comment }}</p>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="empty-state">No reviews yet.</p>
+    {% endif %}
+  </div>
+</div>
 
-<footer class="site">
-  <div class="wrap">Bookmark — a personal reading log. Data shown here is static; built for a FastAPI backend.</div>
-</footer>
-
-<script src="data.js"></script>
-<script src="script.js"></script>
-<script>renderBookDetail();</script>
-</body>
-</html>
+{% endblock %}
