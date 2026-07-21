@@ -3,9 +3,14 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 
+
+
+
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+templates = Jinja2Templates(directory="templates")
 
 
 authors: list[dict] = [
@@ -53,11 +58,24 @@ books: list[dict] = [
     },
 ]
 
+GENRE_COLOR = {
+  "Fiction": "sage",
+  "Historical Fiction": "ochre",
+  "Poetry": "rose",
+  "Essays": "rose",
+  "Nonfiction": "slate",
+  "Fantasy": "plum",
+}
+
 
 @app.get("/", include_in_schema=False)
 @app.get("/home", include_in_schema=False)
-def home():
-    return books
+def home(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "index.html",
+        {"authors" : authors, "books" : books}
+    )
 
 
 @app.get("/api/authors")
