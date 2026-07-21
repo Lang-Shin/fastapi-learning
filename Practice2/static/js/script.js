@@ -1,6 +1,9 @@
 // ---------------------------------------------------------
-// Shared helpers. Each page calls one render function at
-// the bottom of its own <script> block.
+// Shared helpers for pages still running on static data.js:
+// book.html, author.html, authors.html.
+//
+// index.html no longer uses this file — it's rendered
+// server-side by Jinja2 now (see templates/index.html).
 // ---------------------------------------------------------
 
 function getAuthor(id) {
@@ -25,7 +28,6 @@ function avgRating(book) {
   return sum / book.reviews.length;
 }
 
-// renders 5 dots, filled up to Math.round(rating)
 function dotsHtml(rating) {
   const rounded = Math.round(rating || 0);
   let out = '<span class="dots" aria-label="' + (rating ? rating.toFixed(1) : "No ratings") + ' out of 5">';
@@ -84,13 +86,6 @@ function coverBlockHtml(book) {
     <div class="cover-block ${toneClass(book.genre)}">
       <span class="cover-title">${book.title}</span>
     </div>`;
-}
-
-// ---- page: index.html ----
-function renderHome() {
-  document.getElementById("shelf-row").innerHTML = BOOKS.slice(0, 10).map(spineHtml).join("");
-  document.getElementById("book-grid").innerHTML = BOOKS.map(bookCardHtml).join("");
-  document.getElementById("book-count").textContent = BOOKS.length;
 }
 
 // ---- page: authors.html ----
