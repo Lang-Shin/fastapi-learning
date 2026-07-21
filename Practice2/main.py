@@ -87,9 +87,24 @@ def authors_page(request: Request):
         {"authors" : authors, "books" : books}
     )
     
+    
+@app.get("/authors/{author_id}", include_in_schema=False)
+def get_author(request: Request, author_id: int):
+    for author in authors:
+        if author.get("id") == author_id:
+            author_books = [b for b in books if b['authorId'] == author_id]
+            
+            return templates.TemplateResponse(
+                request,
+                "author.html",
+                {"author" : author, "books" : author_books}
+            )
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Author not found.")
+    
 
+#  Book Page Route
 @app.get("/books/{book_id}", include_in_schema=False)
-def book_shelf(request: Request, book_id: int):
+def get_book(request: Request, book_id: int):
     for book in books:
         if book.get("id") == book_id:
             author = next((a for a in authors if a['id'] == book.get("authorId")))
@@ -97,8 +112,7 @@ def book_shelf(request: Request, book_id: int):
             return templates.TemplateResponse(
                 request,
                 "book.html",
-                {"book" : book, "author" : author},
-                status_code=status.HTTP_200_OK
+                {"book" : book, "author" : author}
             )
             
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found.")
