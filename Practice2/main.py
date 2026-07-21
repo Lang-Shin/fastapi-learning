@@ -68,6 +68,7 @@ GENRE_COLOR = {
 }
 
 
+# Home Route
 @app.get("/", include_in_schema=False)
 @app.get("/home", include_in_schema=False)
 def home(request: Request):
@@ -77,6 +78,14 @@ def home(request: Request):
         {"authors" : authors, "books" : books}
     )
 
+
+@app.get("/authors", include_in_schema=False)
+def authors_page(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "authors.html",
+        {"authors" : authors, "books" : books}
+    )
 
 @app.get("/api/authors")
 def get_authors():
