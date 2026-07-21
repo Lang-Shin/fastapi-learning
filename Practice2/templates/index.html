@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bookmark · A Personal Library</title>
-<link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Bookmark · A Personal Library{% endblock %}
+{% block content %}
 
 {% set genre_tone = {
   'Fiction': 'sage',
@@ -17,77 +11,58 @@
   'Fantasy': 'plum'
 } %}
 
-<header class="site">
-  <div class="wrap">
-    <div class="wordmark"><a href="{{ url_for("home") }}">Bookmark<span class="dot">.</span></a></div>
-    <nav class="primary">
-      <a href="/" aria-current="page">Books</a>
-      <a href="/authors">Authors</a>
-    </nav>
-  </div>
-</header>
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow">A personal library</div>
+    <h1>Every book you've read,<br>kept quietly in order.</h1>
+    <p class="sub">A running shelf of what's been read, who wrote it, and what was thought of it. No noise, no algorithm — just the record.</p>
 
-<main>
-  <div class="wrap">
+    <div class="shelf" aria-label="Browse by spine">
+      {% for book in books[:10] %}
+        <a class="spine tone-{{ genre_tone.get(book.genre, 'sage') }}" href="/books/{{ book.id }}" title="{{ book.title }}">
+          <span class="spine-label">{{ book.title }}</span>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
 
-    <section class="hero">
-      <div class="eyebrow">A personal library</div>
-      <h1>Every book you've read,<br>kept quietly in order.</h1>
-      <p class="sub">A running shelf of what's been read, who wrote it, and what was thought of it. No noise, no algorithm — just the record.</p>
+  <section>
+    <div class="section-head">
+      <h2>All books</h2>
+      <span class="count-tag">{{ books|length }} titles tracked</span>
+    </div>
 
-      <div class="shelf" aria-label="Browse by spine">
-        {% for book in books[:10] %}
-          <a class="spine tone-{{ genre_tone.get(book.genre, 'sage') }}" href="/books/{{ book.id }}" title="{{ book.title }}">
-            <span class="spine-label">{{ book.title }}</span>
-          </a>
-        {% endfor %}
-      </div>
-    </section>
+    <div class="grid">
+      {% for book in books %}
+        {% set author = authors | selectattr('id', 'equalto', book.authorId) | first %}
+        {% set review_count = book.reviews|length %}
+        {% set avg = (book.reviews | sum(attribute='rating') / review_count) if review_count > 0 else None %}
+        {% set rounded = avg|round(0, 'common')|int if avg else 0 %}
 
-    <section>
-      <div class="section-head">
-        <h2>All books</h2>
-        <span class="count-tag">{{ books|length }} titles tracked</span>
-      </div>
-
-      <div class="grid">
-        {% for book in books %}
-          {% set author = authors | selectattr('id', 'equalto', book.authorId) | first %}
-          {% set review_count = book.reviews|length %}
-          {% set avg = (book.reviews | sum(attribute='rating') / review_count) if review_count > 0 else None %}
-          {% set rounded = avg|round(0, 'common')|int if avg else 0 %}
-
-          <a class="card tone-{{ genre_tone.get(book.genre, 'sage') }}" href="/books/{{ book.id }}">
-            <span class="tag-genre">{{ book.genre }}</span>
-            <h3>{{ book.title }}</h3>
-            <span class="by">by {{ author.name if author else "Unknown" }}</span>
-            <div class="meta">
-              <span class="rating-line">
-                <span class="dots">
-                  {% for i in range(1, 6) %}
-                    <span class="dot {{ 'filled' if i <= rounded else '' }}"></span>
-                  {% endfor %}
-                </span>
-                {% if avg %}
-                  <span class="num">{{ "%.1f"|format(avg) }}</span>
-                  <span>({{ review_count }})</span>
-                {% else %}
-                  <span>No reviews yet</span>
-                {% endif %}
+        <a class="card tone-{{ genre_tone.get(book.genre, 'sage') }}" href="/books/{{ book.id }}">
+          <span class="tag-genre">{{ book.genre }}</span>
+          <h3>{{ book.title }}</h3>
+          <span class="by">by {{ author.name if author else "Unknown" }}</span>
+          <div class="meta">
+            <span class="rating-line">
+              <span class="dots">
+                {% for i in range(1, 6) %}
+                  <span class="dot {{ 'filled' if i <= rounded else '' }}"></span>
+                {% endfor %}
               </span>
-              <span>{{ book.pages }}p · {{ book.year }}</span>
-            </div>
-          </a>
-        {% endfor %}
-      </div>
-    </section>
+              {% if avg %}
+                <span class="num">{{ "%.1f"|format(avg) }}</span>
+                <span>({{ review_count }})</span>
+              {% else %}
+                <span>No reviews yet</span>
+              {% endif %}
+            </span>
+            <span>{{ book.pages }}p · {{ book.year }}</span>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+</div>
 
-  </div>
-</main>
-
-<footer class="site">
-  <div class="wrap">Bookmark — a personal reading log. Rendered server-side with FastAPI + Jinja2.</div>
-</footer>
-
-</body>
-</html>
+{% endblock %}

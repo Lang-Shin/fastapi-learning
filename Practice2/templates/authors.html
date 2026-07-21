@@ -1,24 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Authors · Bookmark</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
+{% extends "index.html" %}
+{% block content %}
 
-<header class="site">
-  <div class="wrap">
-    <div class="wordmark">Bookmark<span class="dot">.</span></div>
-    <nav class="primary">
-      <a href="index.html">Books</a>
-      <a href="authors.html" aria-current="page">Authors</a>
-    </nav>
-  </div>
-</header>
-
-<main>
   <div class="wrap">
 
     <section class="hero" style="margin-bottom: 40px;">
@@ -30,20 +12,24 @@
     <section>
       <div class="section-head">
         <h2>All authors</h2>
-        <span class="count-tag"><span id="author-count">0</span> authors</span>
+        <span class="count-tag">{{ authors|length }} authors</span>
       </div>
-      <div class="grid" id="author-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));"></div>
+
+      <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+        {% for author in authors %}
+          {% set book_count = books | selectattr('authorId', 'equalto', author.id) | list | length %}
+          <a class="author-card" href="/authors/{{ author.id }}">
+            <span class="avatar">{{ author.initials }}</span>
+            <div>
+              <h3>{{ author.name }}</h3>
+              <p>{{ author.bio }}</p>
+              <span class="book-count">{{ book_count }} book{{ "" if book_count == 1 else "s" }} tracked</span>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
     </section>
 
   </div>
-</main>
 
-<footer class="site">
-  <div class="wrap">Bookmark — a personal reading log. Data shown here is static; built for a FastAPI backend.</div>
-</footer>
-
-<script src="data.js"></script>
-<script src="script.js"></script>
-<script>renderAuthors();</script>
-</body>
-</html>
+{% endblock content %}
