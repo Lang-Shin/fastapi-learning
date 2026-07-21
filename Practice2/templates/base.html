@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Bookmark{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <div class="wordmark"><a href="{{ url_for('home') }}">Bookmark<span class="dot">.</span></a></div>
+    <nav class="primary">
+      <a href="{{ url_for('home') }}" aria-current="{{ 'page' if active == 'books' else 'false' }}">Books</a>
+      <a href="{{ url_for('authors_page') }}" aria-current="{{ 'page' if active == 'authors' else 'false' }}">Authors</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site">
+  <div class="wrap">Bookmark — a personal reading log. Rendered server-side with FastAPI + Jinja2.</div>
+</footer>
+
+</body>
+</html>
