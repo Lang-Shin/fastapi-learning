@@ -1,9 +1,9 @@
 from fastapi import FastAPI, HTTPException, status, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-
-
-
+from starlette.exceptions import HTTPException as starletteHTTPException
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 
 app = FastAPI()
@@ -145,3 +145,26 @@ def get_book(book_id: int):
             return book
         
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found")
+
+
+@app.exception_handler(starletteHTTPException)
+def general_exception_handler(request: Request, exception: starletteHTTPException):
+    msg = (
+        exception.detail
+        if exception.detail
+        else "An error occured. Please check your request and try again."
+    )
+    
+    if request.url.path.startswith("/api"):
+        return JSONResponse(status_code=exception.status_code, content={"detail": msg})
+    
+    return templates.TemplateResponse(
+        request,
+        "error.html",
+        {
+            "status_code": exception.status_code,
+            "title": exception.status_code,
+            "detail": msg
+        },
+        status_code=exception.status_code
+    )
