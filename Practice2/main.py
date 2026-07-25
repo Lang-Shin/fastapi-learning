@@ -123,7 +123,7 @@ def get_authors():
     return authors
 
 
-@app.get("/api/author/{author_id}")
+@app.get("/api/authors/{author_id}")
 def get_author(author_id: int):
     for author in authors:
         if author.get("id") == author_id:
@@ -138,7 +138,7 @@ def get_books():
 
 
 
-@app.get("/api/book/{book_id}")
+@app.get("/api/books/{book_id}")
 def get_book(book_id: int):
     for book in books:
         if book.get("id") == book_id:
@@ -167,4 +167,24 @@ def general_exception_handler(request: Request, exception: starletteHTTPExceptio
             "detail": msg
         },
         status_code=exception.status_code
+    )
+    
+@app.exception_handler(RequestValidationError)
+def validation_exception_handler(request: Request, exception: RequestValidationError):
+    
+    if request.url.path.startswith("/api"):
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            content={"detail": exception.errors()}
+        )
+        
+    return templates.TemplateResponse(
+        request,
+        "error.html",
+        {
+            "status_code": status.HTTP_422_UNPROCESSABLE_CONTENT,
+            "title": status.HTTP_422_UNPROCESSABLE_CONTENT,
+            "detail": "Invalid request. Please check your input and try again."
+        },
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT
     )
