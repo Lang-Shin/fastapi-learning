@@ -35,7 +35,7 @@ class BookBase(BaseModel):
     pages: int
     year: int
     description: str = Field(min_length=1)
-    reviews: list[dict]
+    reviews: list[dict] = []
     
 class BookCreate(BookBase):
     author_id: int

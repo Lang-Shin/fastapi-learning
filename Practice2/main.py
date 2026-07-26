@@ -160,6 +160,28 @@ def get_book(book_id: int):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found")
 
 
+@app.post("/api/books", response_model=BookResponse, status_code=status.HTTP_201_CREATED)
+def add_book(book: BookCreate):
+    if not any(a['id'] == book.author_id for a in authors):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Author not found")
+    
+    new_id = max(b["id"] for b in books) + 1 if book else 1
+    
+    new_book = {
+        "id" : new_id,
+        "title" : book.title,
+        "genre" : book.genre,
+        "pages" : book.pages,
+        "year" : book.year,
+        "description" : book.description,
+        "reviews" : book.reviews
+    }
+    
+    books.append(new_book)
+    
+    return new_book
+
+
 @app.exception_handler(starletteHTTPException)
 def general_exception_handler(request: Request, exception: starletteHTTPException):
     msg = (
