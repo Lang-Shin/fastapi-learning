@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as starletteHTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-
+from schemas import AuthorCreate, AuthorResponse, BookCreate, BookResponse
 
 app = FastAPI()
 
@@ -87,7 +87,7 @@ def authors_page(request: Request):
         {"authors" : authors, "books" : books}
     )
     
-    
+# Author Page Route
 @app.get("/authors/{author_id}", include_in_schema=False)
 def get_author(request: Request, author_id: int):
     for author in authors:
@@ -118,12 +118,12 @@ def get_book(request: Request, book_id: int):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found.")
 
 
-@app.get("/api/authors")
+@app.get("/api/authors", response_model=list[AuthorResponse])
 def get_authors():
     return authors
 
 
-@app.get("/api/authors/{author_id}")
+@app.get("/api/authors/{author_id}", response_model=AuthorResponse)
 def get_author(author_id: int):
     for author in authors:
         if author.get("id") == author_id:
@@ -132,13 +132,13 @@ def get_author(author_id: int):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Author not found.")
 
 
-@app.get("/api/books")
+@app.get("/api/books", response_model=list[BookResponse])
 def get_books():
     return books;
 
 
 
-@app.get("/api/books/{book_id}")
+@app.get("/api/books/{book_id}", response_model=BookResponse)
 def get_book(book_id: int):
     for book in books:
         if book.get("id") == book_id:
