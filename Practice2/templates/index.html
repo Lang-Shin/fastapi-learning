@@ -34,7 +34,7 @@
 
     <div class="grid">
       {% for book in books %}
-        {% set author = authors | selectattr('id', 'equalto', book.authorId) | first %}
+        {% set author = authors | selectattr('id', 'equalto', book.author_id) | first %}
         {% set review_count = book.reviews|length %}
         {% set avg = (book.reviews | sum(attribute='rating') / review_count) if review_count > 0 else None %}
         {% set rounded = avg|round(0, 'common')|int if avg else 0 %}

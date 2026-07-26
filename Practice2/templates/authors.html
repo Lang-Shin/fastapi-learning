@@ -17,7 +17,7 @@
 
       <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
         {% for author in authors %}
-          {% set book_count = books | selectattr('authorId', 'equalto', author.id) | list | length %}
+          {% set book_count = books | selectattr('author_id', 'equalto', author.id) | list | length %}
           <a class="author-card" href="/authors/{{ author.id }}">
             <span class="avatar">{{ author.initials }}</span>
             <div>

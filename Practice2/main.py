@@ -32,7 +32,7 @@ books: list[dict] = [
     {
         "id": 1,
         "title": "The Quiet Ledger",
-        "authorId": 1,
+        "author_id": 1,
         "genre": "Fiction",
         "pages": 312,
         "year": 2019,
@@ -46,7 +46,7 @@ books: list[dict] = [
     {
         "id": 2,
         "title": "Harbor Light, 1911",
-        "authorId": 2,
+        "author_id": 2,
         "genre": "Historical Fiction",
         "pages": 428,
         "year": 2021,
@@ -59,7 +59,7 @@ books: list[dict] = [
     {
         "id": 3,
         "title": "Return Address",
-        "authorId": 1,
+        "author_id": 1,
         "genre": "Fiction",
         "pages": 274,
         "year": 2023,
@@ -105,7 +105,7 @@ def authors_page(request: Request):
 def get_author(request: Request, author_id: int):
     for author in authors:
         if author.get("id") == author_id:
-            author_books = [b for b in books if b['authorId'] == author_id]
+            author_books = [b for b in books if b['author_id'] == author_id]
             
             return templates.TemplateResponse(
                 request,
@@ -120,7 +120,7 @@ def get_author(request: Request, author_id: int):
 def get_book(request: Request, book_id: int):
     for book in books:
         if book.get("id") == book_id:
-            author = next((a for a in authors if a['id'] == book.get("authorId")))
+            author = next((a for a in authors if a['id'] == book.get("author_id")))
             
             return templates.TemplateResponse(
                 request,
@@ -162,14 +162,16 @@ def get_book(book_id: int):
 
 @app.post("/api/books", response_model=BookResponse, status_code=status.HTTP_201_CREATED)
 def add_book(book: BookCreate):
+   
     if not any(a['id'] == book.author_id for a in authors):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Author not found")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Author not found.")
     
     new_id = max(b["id"] for b in books) + 1 if book else 1
     
     new_book = {
         "id" : new_id,
         "title" : book.title,
+        "author_id": book.author_id,
         "genre" : book.genre,
         "pages" : book.pages,
         "year" : book.year,
