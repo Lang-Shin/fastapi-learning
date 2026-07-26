@@ -13,6 +13,7 @@ class ReviewResponse(ReviewBase):
     model_config = ConfigDict(from_attributes=True)
     
     id: int
+    book_id: int
 
 class AuthorBase(BaseModel):
     name: str = Field(min_length=1, max_length=100)
@@ -43,3 +44,5 @@ class BookResponse(BookBase):
     model_config = ConfigDict(from_attributes=True)
     
     id: int
+    # author_id: int
+    # reviews: list[ReviewResponse] 

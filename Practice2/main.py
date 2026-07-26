@@ -56,6 +56,19 @@ books: list[dict] = [
             { "reviewer": "Priya S.", "rating": 5, "comment": "Immersive and humane. I felt the cold." },
         ],
     },
+    {
+        "id": 3,
+        "title": "Return Address",
+        "authorId": 1,
+        "genre": "Fiction",
+        "pages": 274,
+        "year": 2023,
+        "description": "A postal worker in a coastal town spends a year trying to deliver a single undeliverable letter to its rightful owner.",
+        "reviews": [
+            { "reviewer": "j.reads", "rating": 4, "comment": "Gentle, funny, a little sad. Very her." },
+            { "reviewer": "Sam O.", "rating": 3, "comment": "Sweet but slight compared to The Quiet Ledger." },
+        ],
+    },
 ]
 
 GENRE_COLOR = {
