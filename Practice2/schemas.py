@@ -15,6 +15,7 @@ class ReviewResponse(ReviewBase):
     id: int
     book_id: int
 
+
 class AuthorBase(BaseModel):
     name: str = Field(min_length=1, max_length=100)
     bio: str = Field(max_length=500)
