@@ -45,5 +45,5 @@ class BookResponse(BookBase):
     model_config = ConfigDict(from_attributes=True)
     
     id: int
-    # author_id: int
-    # reviews: list[ReviewResponse] 
+    author_id: int
+    reviews: list[ReviewResponse] = []
