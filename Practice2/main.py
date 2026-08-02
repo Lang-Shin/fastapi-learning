@@ -201,7 +201,37 @@ def get_book(book_id: int, db: Annotated[Session, Depends(get_db)]):
 
 @app.post("/api/books", response_model=BookResponse, status_code=status.HTTP_201_CREATED)
 def add_book(book: BookCreate, db: Annotated[Session, Depends(get_db)]):
-    pass
+    result = db.execute(
+        select(models.Author).where(models.Author.id == book.author_id)
+    )
+    author = result.scalars().all()
+    
+    if not author:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Author not found.")
+    
+    result = db.execute(
+        select(models.Book).where(models.Book.title == book.title)
+    )
+    book = result.scalars().all()
+    
+    if book:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Book already exist.")
+    
+    new_book = models.Book(
+        title=book.title,
+        genre=book.genre,
+        pages=book.pages,
+        year=book.year,
+        description=book.description,
+        author=book.author,
+        reviews=book.reviews
+    )
+    
+    db.add(new_book)
+    db.commit()
+    db.refresh(new_book)
+    
+    return new_book
     
    
     # if not any(a['id'] == book.author_id for a in authors):
