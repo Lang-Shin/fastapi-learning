@@ -13,6 +13,8 @@ import models
 from seed import Base, engine, get_db
 from typing import Annotated
 
+Base.metadata.create_all(engine)
+
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
