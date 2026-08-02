@@ -203,6 +203,29 @@ def get_book(book_id: int, db: Annotated[Session, Depends(get_db)]):
     return book
 
 
+@app.post("/api/authors", response_model=AuthorResponse, status_code=status.HTTP_201_CREATED)
+def add_author(author: AuthorCreate, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(
+        select(models.Author).where(models.Author.name == author.name)
+    )
+    existing_author = result.scalars().first()
+    
+    if existing_author:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Author already exists.")
+    
+    new_author = models.Author(
+        name=author.name,
+        bio=author.bio,
+        initials=author.initials
+    )
+    
+    db.add(new_author)
+    db.commit()
+    db.refresh(new_author)
+    
+    return new_author
+
+
 @app.post("/api/books", response_model=BookResponse, status_code=status.HTTP_201_CREATED)
 def add_book(book: BookCreate, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(
