@@ -25,7 +25,7 @@ class Book(Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"), nullable=False)        # Foreign Key
     
-    author: Mapped["Author"] = relationship(back_populates="books", cascade="all, delete-orphan")
+    author: Mapped["Author"] = relationship(back_populates="books")
     reviews: Mapped[list["Review"]] = relationship(back_populates="book", cascade="all, delete-orphan")
     
     
@@ -36,6 +36,6 @@ class Review(Base):
     reviewer: Mapped[str] = mapped_column(String(100), nullable=False)
     rating: Mapped[int] = mapped_column(Integer, nullable=False)
     comment: Mapped[str | None] = mapped_column(Text, nullable=True)
-    book_id: Mapped["Book"] = mapped_column(ForeignKey("books.id"), nullable=False)
+    book_id: Mapped[int] = mapped_column(ForeignKey("books.id"), nullable=False)
     
     book: Mapped["Book"] = relationship(back_populates="reviews")

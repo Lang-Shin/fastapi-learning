@@ -1,3 +1,5 @@
+# main.py
+
 from fastapi import FastAPI, HTTPException, status, Request, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -204,7 +206,7 @@ def add_book(book: BookCreate, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(
         select(models.Author).where(models.Author.id == book.author_id)
     )
-    author = result.scalars().all()
+    author = result.scalars().first()
     
     if not author:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Author not found.")
@@ -212,10 +214,10 @@ def add_book(book: BookCreate, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(
         select(models.Book).where(models.Book.title == book.title)
     )
-    book = result.scalars().all()
+    existing = result.scalars().first()
     
-    if book:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Book already exist.")
+    if existing:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Book already exists.")
     
     new_book = models.Book(
         title=book.title,
@@ -223,8 +225,8 @@ def add_book(book: BookCreate, db: Annotated[Session, Depends(get_db)]):
         pages=book.pages,
         year=book.year,
         description=book.description,
-        author=book.author,
-        reviews=book.reviews
+        author=author,
+        reviews=[models.Review(**r) for r in book.reviews]
     )
     
     db.add(new_book)
@@ -232,27 +234,6 @@ def add_book(book: BookCreate, db: Annotated[Session, Depends(get_db)]):
     db.refresh(new_book)
     
     return new_book
-    
-   
-    # if not any(a['id'] == book.author_id for a in authors):
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Author not found.")
-    
-    # new_id = max(b["id"] for b in books) + 1 if book else 1
-    
-    # new_book = {
-    #     "id" : new_id,
-    #     "title" : book.title,
-    #     "author_id": book.author_id,
-    #     "genre" : book.genre,
-    #     "pages" : book.pages,
-    #     "year" : book.year,
-    #     "description" : book.description,
-    #     "reviews" : book.reviews
-    # }
-    
-    # books.append(new_book)
-    
-    # return new_book
 
 
 @app.exception_handler(starletteHTTPException)
