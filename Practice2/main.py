@@ -6,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as starletteHTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from schemas import AuthorCreate, AuthorResponse, BookCreate, BookResponse
+from schemas import AuthorCreate, AuthorResponse, BookCreate, BookResponse, ReviewCreate, ReviewResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 import models
@@ -21,64 +21,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-
-# authors: list[dict] = [
-#      {
-#         "id": 1,
-#         "name": "Naomi Alderisi",
-#         "bio": "Writes quiet, character-driven fiction about people rebuilding their lives in small towns.",
-#         "initials": "NA",
-#   },
-#   {
-#         "id": 2,
-#         "name": "Femi Okonkwo-Blythe",
-#         "bio": "Historian turned novelist, known for meticulously researched historical fiction.",
-#         "initials": "FB",
-#   },
-# ]
-
-# books: list[dict] = [
-#     {
-#         "id": 1,
-#         "title": "The Quiet Ledger",
-#         "author_id": 1,
-#         "genre": "Fiction",
-#         "pages": 312,
-#         "year": 2019,
-#         "description": "A bookkeeper in a dying mill town discovers a decade of falsified accounts left by her late father, and has to decide who the truth is actually for.",
-#         "reviews": [
-#             { "reviewer": "M. Ostrander", "rating": 5, "comment": "Restrained and devastating. Not a wasted sentence." },
-#             { "reviewer": "j.reads", "rating": 4, "comment": "Slow start, but it earns the ending." },
-#             { "reviewer": "Terri K.", "rating": 4, "comment": "Quietly one of the best things I read this year." },
-#         ],
-#     },
-#     {
-#         "id": 2,
-#         "title": "Harbor Light, 1911",
-#         "author_id": 2,
-#         "genre": "Historical Fiction",
-#         "pages": 428,
-#         "year": 2021,
-#         "description": "Three lighthouse keepers' families navigate a shipping strike on a fictional New England coast, based on real labor archives.",
-#         "reviews": [
-#             { "reviewer": "Dockside Reader", "rating": 5, "comment": "The research shows without ever showing off." },
-#             { "reviewer": "Priya S.", "rating": 5, "comment": "Immersive and humane. I felt the cold." },
-#         ],
-#     },
-#     {
-#         "id": 3,
-#         "title": "Return Address",
-#         "author_id": 1,
-#         "genre": "Fiction",
-#         "pages": 274,
-#         "year": 2023,
-#         "description": "A postal worker in a coastal town spends a year trying to deliver a single undeliverable letter to its rightful owner.",
-#         "reviews": [
-#             { "reviewer": "j.reads", "rating": 4, "comment": "Gentle, funny, a little sad. Very her." },
-#             { "reviewer": "Sam O.", "rating": 3, "comment": "Sweet but slight compared to The Quiet Ledger." },
-#         ],
-#     },
-# ]
 
 GENRE_COLOR = {
   "Fiction": "sage",
@@ -259,6 +201,30 @@ def add_book(book: BookCreate, db: Annotated[Session, Depends(get_db)]):
     db.refresh(new_book)
     
     return new_book
+
+
+@app.post("/api/books/{book_id}/reviews", response_model=ReviewResponse, status_code=status.HTTP_201_CREATED)
+def add_review(book_id: int, review: ReviewCreate, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(
+        select(models.Book).where(models.Book.id == book_id)
+    )
+    book = result.scalars().first()
+    
+    if not book:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found.")
+    
+    new_review = models.Review(
+        reviewer=review.reviewer,
+        rating=review.rating,
+        comment=review.comment,
+        book=book
+    )
+    
+    db.add(new_review)
+    db.commit()
+    db.refresh(new_review)
+    
+    return new_review
 
 
 @app.exception_handler(starletteHTTPException)
